@@ -565,18 +565,16 @@ BlurRegion BlurEffect::contentRegion(EffectWindow *w) const
 
     if (auto it = m_windows.find(w); it != m_windows.end()) {
         const std::optional<BlurRegion> &content = it->second.content;
-        if (content.has_value()) {
-            if (content->isEmpty()) {
-                // An empty region means that the blur effect should be enabled
-                // for the whole window.
+        if (content.has_value() && !content->isEmpty()) {
+            region = content->translated(w->contentsRect().topLeft().toPoint()) & w->contentsRect().toRect();
+        } else {
+            // An empty region means that the blur effect should be enabled
+            // for the whole window.
 #ifdef GLASS_X11
-                region = BlurRegion(w->contentsRect().toRect());
+            region = BlurRegion(w->contentsRect().toRect());
 #else
-                region = Region(Rect(w->contentsRect().toRect()));
+            region = Region(Rect(w->contentsRect().toRect()));
 #endif
-            } else {
-                region = content->translated(w->contentsRect().topLeft().toPoint()) & w->contentsRect().toRect();
-            }
         }
     }
 

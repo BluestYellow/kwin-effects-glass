@@ -24,8 +24,16 @@ public:
 
     void save() override;
 
+private Q_SLOTS:
+    void onProfileChanged(const QString &profileName);
+    void onControlModified();
+
 private:
     ::Ui::BlurEffectConfig ui;
+    bool m_updatingFromPreset = false;
+
+    void populateProfiles();
+    void applyPreset(const QString &profileName);
 
     void setContextualHelp(
         KContextualHelpButton *const contextualHelpButton,

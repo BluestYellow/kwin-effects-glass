@@ -4,7 +4,10 @@
     xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
     http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
     <kcfgfile arg="true"/>
-    <group name="Effect-blurplus">
+    <group name="Effect-blurplus-custom">
+        <entry name="ActiveProfile" type="String">
+            <default>LiquidGlass</default>
+        </entry>
         <entry name="EdgeLighting" type="Bool">
             <default>false</default>
         </entry>
@@ -41,10 +44,13 @@ class2
 class3</default>
         </entry>
         <entry name="BlurMatching" type="Bool">
-            <default>true</default>
+            <default>false</default>
         </entry>
         <entry name="BlurNonMatching" type="Bool">
             <default>false</default>
+        </entry>
+        <entry name="BlurAllExceptDocksMenus" type="Bool">
+            <default>true</default>
         </entry>
         <entry name="TransparentBlur" type="Bool">
             <default>true</default>

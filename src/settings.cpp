@@ -51,9 +51,16 @@ void BlurSettings::read()
     general.edgeLightingDock = BlurConfig::edgeLightingDock();
     general.edgeLightingTooltip = BlurConfig::edgeLightingTooltip();
     general.excludeDocks = BlurConfig::excludeDocks();
+    general.activeProfile = BlurConfig::activeProfile();
 
     forceBlur.windowClasses = parseWindowClasses(BlurConfig::windowClasses());
-    forceBlur.windowClassMatchingMode = BlurConfig::blurMatching() ? WindowClassMatchingMode::Whitelist : WindowClassMatchingMode::Blacklist;
+    if (BlurConfig::blurMatching()) {
+        forceBlur.windowClassMatchingMode = WindowClassMatchingMode::Whitelist;
+    } else if (BlurConfig::blurNonMatching()) {
+        forceBlur.windowClassMatchingMode = WindowClassMatchingMode::Blacklist;
+    } else {
+        forceBlur.windowClassMatchingMode = WindowClassMatchingMode::AllExceptDocksAndMenus;
+    }
     forceBlur.blurDecorations = BlurConfig::blurDecorations();
     forceBlur.onlyBlurContentWindow = BlurConfig::onlyBlurContentWindow();
     forceBlur.blurMenus = BlurConfig::blurMenus();

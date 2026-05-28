@@ -699,15 +699,24 @@ bool BlurEffect::shouldBlur(const EffectWindow *w, int mask, const WindowPaintDa
 
     auto classes = m_windowClasses;
 
-    // Add some apps to the exclusion list
-    if (!m_whitelist) {
-      classes << QString("spectacle") << QString("xwaylandvideobridge");
-    }
-
-    const auto matches = classes.contains(windowClass) || classes.contains(resourceName);
-
-    if ((m_whitelist && !matches) || (!m_whitelist && matches)) {
-        return false;
+    if (m_settings.forceBlur.windowClassMatchingMode == WindowClassMatchingMode::AllExceptDocksAndMenus) {
+        if (w->isDock() || w->isMenu() || w->isDropdownMenu() || w->isPopupMenu() || w->isPopupWindow()) {
+            return false;
+        }
+        classes << QStringLiteral("spectacle") << QStringLiteral("xwaylandvideobridge");
+        const auto matches = classes.contains(windowClass) || classes.contains(resourceName);
+        if (matches) {
+            return false;
+        }
+    } else {
+        // Add some apps to the exclusion list
+        if (!m_whitelist) {
+            classes << QStringLiteral("spectacle") << QStringLiteral("xwaylandvideobridge");
+        }
+        const auto matches = classes.contains(windowClass) || classes.contains(resourceName);
+        if ((m_whitelist && !matches) || (!m_whitelist && matches)) {
+            return false;
+        }
     }
 
     bool scaled = !qFuzzyCompare(data.xScale(), 1.0) && !qFuzzyCompare(data.yScale(), 1.0);

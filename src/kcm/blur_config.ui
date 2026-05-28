@@ -12,6 +12,36 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
+    <layout class="QHBoxLayout" name="profileLayout">
+     <item>
+      <widget class="QLabel" name="labelProfile">
+       <property name="text">
+        <string>Profile:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="ActiveProfile"/>
+     </item>
+     <item>
+      <spacer name="profileSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -419,24 +449,31 @@
        <item>
         <widget class="QPlainTextEdit" name="kcfg_WindowClasses"/>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="layoutMatchingMode">
-         <item>
-          <widget class="QRadioButton" name="kcfg_BlurMatching">
-           <property name="text">
-            <string>Blur only matching</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="kcfg_BlurNonMatching">
-           <property name="text">
-            <string>Blur all except matching</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
+        <item>
+         <layout class="QHBoxLayout" name="layoutMatchingMode">
+          <item>
+           <widget class="QRadioButton" name="kcfg_BlurAllExceptDocksMenus">
+            <property name="text">
+             <string>Blur all except docks and menus</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="kcfg_BlurMatching">
+            <property name="text">
+             <string>Blur only matching</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="kcfg_BlurNonMatching">
+            <property name="text">
+             <string>Blur all except matching</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        <item>
         <widget class="QCheckBox" name="kcfg_BlurDecorations">
          <property name="text">

@@ -19,8 +19,8 @@
         "Description[fr]": "Effet de verre avec réfraction, flou et plus",
         "EnabledByDefault": false,
         "License": "GPL",
-        "Name": "Glass",
+        "Name": "Glass (Custom)",
         "Name[fr]": "Verre"
     },
-    "X-KDE-ConfigModule": "kwin_glass_config"
+    "X-KDE-ConfigModule": "kwin_glass_custom_config"
 }

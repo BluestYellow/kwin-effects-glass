@@ -10,7 +10,8 @@ QStringList parseWindowClasses(const QString &input);
 enum class WindowClassMatchingMode
 {
     Blacklist,
-    Whitelist
+    Whitelist,
+    AllExceptDocksAndMenus
 };
 
 
@@ -27,6 +28,7 @@ struct GeneralSettings
     bool edgeLightingDock;
     bool edgeLightingTooltip;
     bool excludeDocks;
+    QString activeProfile;
 };
 
 struct ForceBlurSettings

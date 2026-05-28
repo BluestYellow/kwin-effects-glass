@@ -45,22 +45,22 @@ kconfig_add_kcfg_files(glass_SOURCES
 )
 
 if(GLASS_WAYLAND)
-    add_library(glass MODULE ${glass_SOURCES})
-    target_link_libraries(glass PRIVATE
+    add_library(glass_custom MODULE ${glass_SOURCES})
+    target_link_libraries(glass_custom PRIVATE
         KDecoration3::KDecoration
         KF6::ConfigGui
         KWin::kwin
     )
-    install(TARGETS glass DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
+    install(TARGETS glass_custom DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
 endif()
 if(GLASS_X11)
-    add_library(glass_x11 MODULE ${glass_SOURCES})
-    target_link_libraries(glass_x11 PRIVATE
+    add_library(glass_x11_custom MODULE ${glass_SOURCES})
+    target_link_libraries(glass_x11_custom PRIVATE
         KDecoration3::KDecoration
         KF6::ConfigGui
         KWinX11::kwin
         XCB::XCB
     )
-    target_compile_definitions(glass_x11 PRIVATE GLASS_X11)
-    install(TARGETS glass_x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
+    target_compile_definitions(glass_x11_custom PRIVATE GLASS_X11)
+    install(TARGETS glass_x11_custom DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
 endif()

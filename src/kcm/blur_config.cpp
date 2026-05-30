@@ -39,11 +39,11 @@ struct GlassPreset {
 };
 
 static const QMap<QString, GlassPreset> s_presets = {
-    { QStringLiteral("LiquidGlass"), { 12, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20 } },
-    { QStringLiteral("MacosLight"), { 8, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("MacosDark"), { 9, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("WindowsAcrylic"), { 15, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("FrostyGlass"), { 10, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } }
+    { QStringLiteral("LiquidGlass"), { 48, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20 } },
+    { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
+    { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
+    { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
+    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } }
 };
 
 BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)

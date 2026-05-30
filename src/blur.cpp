@@ -243,7 +243,7 @@ void BlurEffect::initBlurStrengthValues()
     // This function creates an array of blur strength values that are evenly distributed
 
     // The range of the slider on the blur settings UI
-    int numOfBlurSteps = 15;
+    int numOfBlurSteps = 60;
     int remainingSteps = numOfBlurSteps;
 
     /*
@@ -270,8 +270,8 @@ void BlurEffect::initBlurStrengthValues()
     blurOffsets.append({2.0, 3.0, 20}); // Down sample size / 4
     blurOffsets.append({2.0, 5.0, 50}); // Down sample size / 8
     blurOffsets.append({3.0, 8.0, 150}); // Down sample size / 16
-    // blurOffsets.append({5.0, 10.0, 400}); // Down sample size / 32
-    // blurOffsets.append({7.0, ?.0});       // Down sample size / 64
+    blurOffsets.append({5.0, 10.0, 400}); // Down sample size / 32
+    blurOffsets.append({7.0, 15.0, 1000}); // Down sample size / 64
 
     float offsetSum = 0;
 

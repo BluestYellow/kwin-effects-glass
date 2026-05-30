@@ -27,7 +27,7 @@
             <default>#00000000</default>
         </entry>
         <entry name="BlurStrength" type="Int">
-            <default>15</default>
+            <default>48</default>
         </entry>
         <entry name="NoiseStrength" type="Int">
             <default>5</default>

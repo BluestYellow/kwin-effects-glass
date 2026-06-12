@@ -14,6 +14,7 @@
 #include "kwineffects_interface.h"
 
 #include <QFileDialog>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QMap>
 #include <QSignalBlocker>
@@ -53,8 +54,28 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
     BlurConfig::instance("kwinrc");
     addConfig(BlurConfig::self(), widget());
 
-    ui.kcfg_OnlyBlurContentWindow->setEnabled(ui.kcfg_BlurDecorations->isChecked());
-    connect(ui.kcfg_BlurDecorations, &QCheckBox::toggled, ui.kcfg_OnlyBlurContentWindow, &QWidget::setEnabled);
+    auto updateRoundedCornerControls = [this]() {
+        const bool useDeclaredCornerRadius = ui.kcfg_UseDeclaredCornerRadius->isChecked();
+        const bool customCornerRadius = !useDeclaredCornerRadius;
+        const bool dynamicCorners = customCornerRadius && ui.kcfg_DynamicCorners->isChecked();
+
+        ui.labelTopCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_TopCornerRadius->setEnabled(customCornerRadius);
+        ui.labelBottomCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_BottomCornerRadius->setEnabled(customCornerRadius);
+        ui.labelMenuCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_MenuCornerRadius->setEnabled(customCornerRadius);
+        ui.labelDockCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_DockCornerRadius->setEnabled(customCornerRadius);
+        ui.kcfg_RoundCornersOfMaximizedWindows->setEnabled(customCornerRadius);
+        ui.kcfg_DynamicCorners->setEnabled(customCornerRadius);
+        ui.kcfg_DynamicCornersExcludeDocks->setEnabled(dynamicCorners);
+        ui.kcfg_DynamicCornersExcludeTooltips->setEnabled(dynamicCorners);
+        ui.kcfg_DynamicCornersExcludeMenus->setEnabled(dynamicCorners);
+    };
+    updateRoundedCornerControls();
+    connect(ui.kcfg_UseDeclaredCornerRadius, &QCheckBox::toggled, this, updateRoundedCornerControls);
+    connect(ui.kcfg_DynamicCorners, &QCheckBox::toggled, this, updateRoundedCornerControls);
 
     QFile about(":/effects/glass/kcm/about.html");
     if (about.open(QIODevice::ReadOnly)) {

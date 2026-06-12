@@ -19,9 +19,17 @@ struct GeneralSettings
 {
     int blurStrength;
     int noiseStrength;
+    int decorationBlurStrength;
+    int decorationNoiseStrength;
+    int dockBlurStrength;
+    int dockNoiseStrength;
     float brightness;
     float saturation;
     float contrast;
+    bool oklabSaturation;
+    float blurRadius;
+    float upsampleOffset;
+    bool saturationCompensation;
     QString tintColor;
     QString glowColor;
     bool edgeLighting;
@@ -29,6 +37,8 @@ struct GeneralSettings
     bool edgeLightingTooltip;
     bool excludeDocks;
     QString activeProfile;
+    bool excludeDecorations;
+    bool excludeTooltips;
 };
 
 struct ForceBlurSettings
@@ -36,7 +46,6 @@ struct ForceBlurSettings
     QStringList windowClasses;
     WindowClassMatchingMode windowClassMatchingMode;
     bool blurDecorations;
-    bool onlyBlurContentWindow;
     bool blurMenus;
     bool blurDocks;
 };
@@ -47,8 +56,13 @@ struct RoundedCornersSettings
     float windowBottomRadius;
     float menuRadius;
     float dockRadius;
+    bool useDeclaredCornerRadius;
+    bool ignoreContentBlurRegion;
     bool roundMaximized;
     bool dynamicCorners;
+    bool dynamicCornersExcludeDocks;
+    bool dynamicCornersExcludeTooltips;
+    bool dynamicCornersExcludeMenus;
 };
 
 struct RefractionSettings
@@ -57,6 +71,8 @@ struct RefractionSettings
     float refractionStrength;
     float refractionNormalPow;
     float refractionRGBFringing;
+    float refractionOffsetStrength;
+    bool physicallyBased;
 };
 
 class BlurSettings

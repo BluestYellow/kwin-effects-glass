@@ -1,6 +1,8 @@
 #include "settings.h"
 #include "blurconfig.h"
 
+#include <algorithm>
+
 namespace KWin
 {
 
@@ -42,9 +44,20 @@ void BlurSettings::read()
 
     general.blurStrength = BlurConfig::blurStrength() - 1;
     general.noiseStrength = BlurConfig::noiseStrength();
+    general.decorationBlurStrength = BlurConfig::decorationBlurStrength() - 1;
+    general.decorationNoiseStrength = BlurConfig::decorationNoiseStrength();
+    general.dockBlurStrength = BlurConfig::dockBlurStrength() - 1;
+    general.dockNoiseStrength = BlurConfig::dockNoiseStrength();
     general.brightness = BlurConfig::brightness();
     general.saturation = BlurConfig::saturation();
     general.contrast = BlurConfig::contrast();
+    general.oklabSaturation = BlurConfig::oklabSaturation();
+
+    const float finetune = 0.5f + std::clamp(BlurConfig::blurFinetune(), 0, 10) * 0.13f;
+    general.blurRadius = finetune;
+    general.upsampleOffset = finetune;
+    general.saturationCompensation = BlurConfig::blurSaturationCompensation();
+
     general.tintColor = BlurConfig::tintColor();
     general.glowColor = BlurConfig::glowColor();
     general.edgeLighting = BlurConfig::edgeLighting();
@@ -52,6 +65,8 @@ void BlurSettings::read()
     general.edgeLightingTooltip = BlurConfig::edgeLightingTooltip();
     general.excludeDocks = BlurConfig::excludeDocks();
     general.activeProfile = BlurConfig::activeProfile();
+    general.excludeDecorations = BlurConfig::excludeDecorations();
+    general.excludeTooltips = BlurConfig::excludeTooltips();
 
     forceBlur.windowClasses = parseWindowClasses(BlurConfig::windowClasses());
     if (BlurConfig::blurMatching()) {
@@ -62,7 +77,6 @@ void BlurSettings::read()
         forceBlur.windowClassMatchingMode = WindowClassMatchingMode::AllExceptDocksAndMenus;
     }
     forceBlur.blurDecorations = BlurConfig::blurDecorations();
-    forceBlur.onlyBlurContentWindow = BlurConfig::onlyBlurContentWindow();
     forceBlur.blurMenus = BlurConfig::blurMenus();
     forceBlur.blurDocks = BlurConfig::blurDocks();
 
@@ -70,13 +84,20 @@ void BlurSettings::read()
     roundedCorners.windowBottomRadius = BlurConfig::bottomCornerRadius();
     roundedCorners.menuRadius = BlurConfig::menuCornerRadius();
     roundedCorners.dockRadius = BlurConfig::dockCornerRadius();
+    roundedCorners.useDeclaredCornerRadius = BlurConfig::useDeclaredCornerRadius();
+    roundedCorners.ignoreContentBlurRegion = BlurConfig::ignoreContentBlurRegion();
     roundedCorners.roundMaximized = BlurConfig::roundCornersOfMaximizedWindows();
     roundedCorners.dynamicCorners = BlurConfig::dynamicCorners();
+    roundedCorners.dynamicCornersExcludeDocks = BlurConfig::dynamicCornersExcludeDocks();
+    roundedCorners.dynamicCornersExcludeTooltips = BlurConfig::dynamicCornersExcludeTooltips();
+    roundedCorners.dynamicCornersExcludeMenus = BlurConfig::dynamicCornersExcludeMenus();
 
     refraction.edgeSizePixels = BlurConfig::refractionEdgeSize() * 10;
     refraction.refractionStrength = BlurConfig::refractionStrength() / 20.0;
     refraction.refractionNormalPow = BlurConfig::refractionNormalPow() / 2.0;
     refraction.refractionRGBFringing = BlurConfig::refractionRGBFringing() / 20.0;
+    refraction.refractionOffsetStrength = BlurConfig::refractionOffsetStrength() / 2.0;
+    refraction.physicallyBased = BlurConfig::physicallyBasedRefraction();
 }
 
 }

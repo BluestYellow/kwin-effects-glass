@@ -64,6 +64,11 @@ struct BlurEffectData
      * Color transformation matrix (contrast, and saturation).
      */
     std::optional<QMatrix4x4> colorMatrix;
+
+    /**
+     * Corner radius reported by the window before this effect overrides it.
+     */
+    std::optional<BorderRadius> originalCornerRadius;
 };
 
 class BlurEffect : public KWin::Effect
@@ -98,7 +103,7 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     bool blocksDirectScanout() const override;
-    bool shouldFlattenCorner(KWin::EffectWindow *w, Qt::Corner corner);
+    bool shouldFlattenCorner(KWin::EffectWindow *w, Qt::Corner corner) const;
 
 public Q_SLOTS:
     void slotWindowAdded(KWin::EffectWindow *w);
@@ -110,16 +115,29 @@ public Q_SLOTS:
     void setupDecorationConnections(EffectWindow *w);
 
 private:
+    struct BlurPipelineSettings
+    {
+        size_t iterationCount;
+        float offset;
+        int expandSize;
+        int noiseStrength;
+    };
+
     void initBlurStrengthValues();
-    BlurRegion contentRegion(EffectWindow *w) const;
-    BlurRegion blurRegion(EffectWindow *w) const;
+    BlurRegion contentRegion(EffectWindow *w, const BorderRadius *fallbackCornerRadius = nullptr) const;
+    BlurRegion blurRegion(EffectWindow *w, const BorderRadius *fallbackCornerRadius = nullptr) const;
+    BlurRegion roundedContentRegion(const QRect &rect, const BorderRadius &cornerRadius, qreal leftSideWidth, qreal rightSideWidth) const;
+    BorderRadius effectiveWindowCornerRadius(EffectWindow *w, const BorderRadius &declaredCornerRadius, bool *isOverRounded = nullptr, bool applyDynamicCorners = true) const;
+    QRectF dynamicCornerRect(EffectWindow *w) const;
     BlurRegion decorationBlurRegion(const EffectWindow *w) const;
     bool decorationSupportsBlurBehind(const EffectWindow *w) const;
     bool shouldBlur(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     void updateBlurRegion(EffectWindow *w);
+    void repaintDynamicCorners();
     void blur(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const BlurRegion &deviceRegion, WindowPaintData &data);
-    GLTexture *ensureNoiseTexture();
+    GLTexture *ensureNoiseTexture(int noiseStrength);
     QMatrix4x4 colorMatrix(const float &brightness, const float &saturation, const float &contrast) const;
+    BlurPipelineSettings pipelineSettingsForStrength(int blurStrength, int noiseStrength) const;
 
 private:
     struct
@@ -127,6 +145,8 @@ private:
         std::unique_ptr<GLShader> shader;
         int mvpMatrixLocation;
         int colorMatrixLocation;
+        int useOklabSaturationLocation;
+        int saturationLocation;
         int offsetLocation;
         int halfpixelLocation;
         int boxLocation;
@@ -138,6 +158,8 @@ private:
         int refractionStrengthLocation;
         int refractionNormalPowLocation;
         int refractionRGBFringingLocation;
+        int refractionOffsetStrengthLocation;
+        int physicallyBasedRefractionLocation;
 
         int tintColorLocation;
         int tintStrengthLocation;
@@ -161,6 +183,7 @@ private:
         int mvpMatrixLocation;
         int offsetLocation;
         int halfpixelLocation;
+        int saturationCompensationLocation;
     } m_upsamplePass;
 
     struct
@@ -184,10 +207,13 @@ private:
     BlurOutput *m_currentOutput = nullptr;
 
     QMatrix4x4 m_colorMatrix;
-    size_t m_iterationCount; // number of times the texture will be downsized to half size
-    int m_offset;
     int m_expandSize;
-    int m_noiseStrength;
+    float m_blurRadius = 1.0f;
+    float m_upsampleOffset = 1.0f;
+    size_t m_maxIterationCount = 1; // number of times the texture will be downsized to half size
+    BlurPipelineSettings m_contentBlurSettings{};
+    BlurPipelineSettings m_decorationBlurSettings{};
+    BlurPipelineSettings m_dockBlurSettings{};
     QStringList m_windowClasses;
     bool m_whitelist;
 

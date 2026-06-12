@@ -8,6 +8,9 @@
         <entry name="ActiveProfile" type="String">
             <default>LiquidGlass</default>
         </entry>
+        <entry name="WindowOpacity" type="Int">
+            <default>100</default>
+        </entry>
         <entry name="EdgeLighting" type="Bool">
             <default>false</default>
         </entry>

@@ -52,6 +52,7 @@ void BlurSettings::read()
     general.edgeLightingTooltip = BlurConfig::edgeLightingTooltip();
     general.excludeDocks = BlurConfig::excludeDocks();
     general.activeProfile = BlurConfig::activeProfile();
+    general.windowOpacity = BlurConfig::windowOpacity() / 100.0f;
 
     forceBlur.windowClasses = parseWindowClasses(BlurConfig::windowClasses());
     if (BlurConfig::blurMatching()) {

@@ -16,10 +16,10 @@ VARYING_IN vec2 vertex;
 
 void main(void)
 {
-    vec2 halfBlurSize = blurSize * 0.5;
+    vec2 halfBlurSize = box.zw;
     float minHalfSize = min(halfBlurSize.x, halfBlurSize.y);
 
-    vec2 position = uv * blurSize - halfBlurSize.xy;
+    vec2 position = vertex - box.xy;
     float dist = roundedRectangleDist(position, halfBlurSize, cornerRadius);
 
     vec4 sum = vec4(0);

@@ -614,6 +614,12 @@ void BlurEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::
     // this effect relies on prePaintWindow being called in the bottom to top order
     effects->prePaintWindow(w, data, presentTime);
 
+    // Apply custom window opacity if configured and the window is tracked by the effect
+    if (m_settings.general.windowOpacity < 1.0f && m_windows.find(w) != m_windows.end()) {
+        data.mask |= PAINT_WINDOW_TRANSLUCENT;
+        data.opaque = QRegion();
+    }
+
     const QRegion oldOpaque = data.opaque;
     if (data.opaque.intersects(m_currentDeviceBlur)) {
         QRegion newOpaque;
@@ -644,6 +650,12 @@ void BlurEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::
 void BlurEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
 {
     effects->prePaintWindow(view, w, data, presentTime);
+
+    // Apply custom window opacity if configured and the window is tracked by the effect
+    if (m_settings.general.windowOpacity < 1.0f && m_windows.find(w) != m_windows.end()) {
+        data.mask |= PAINT_WINDOW_TRANSLUCENT;
+        data.deviceOpaque = Region();
+    }
 
     // 1. Determine the area this window intends to blur
     const Region blurArea = view->mapToDeviceCoordinatesAligned(
@@ -729,6 +741,12 @@ bool BlurEffect::shouldBlur(const EffectWindow *w, int mask, const WindowPaintDa
 
 void BlurEffect::drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const BlurRegion &deviceRegion, WindowPaintData &data)
 {
+    // Apply custom window opacity modulation ONLY to glass/blurred windows
+    if (m_settings.general.windowOpacity < 1.0f && m_windows.find(w) != m_windows.end()) {
+        mask |= PAINT_WINDOW_TRANSLUCENT;
+        data.setOpacity(data.opacity() * m_settings.general.windowOpacity);
+    }
+
     blur(renderTarget, viewport, w, mask, deviceRegion, data);
 
     // Draw the window over the blurred area

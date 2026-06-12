@@ -29,6 +29,7 @@ struct GeneralSettings
     bool edgeLightingTooltip;
     bool excludeDocks;
     QString activeProfile;
+    float windowOpacity;
 };
 
 struct ForceBlurSettings

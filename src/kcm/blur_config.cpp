@@ -36,14 +36,20 @@ struct GlassPreset {
     int refractionEdgeSize;
     int refractionNormalPow;
     int refractionRGBFringing;
+    int windowOpacity;
 };
 
 static const QMap<QString, GlassPreset> s_presets = {
-    { QStringLiteral("LiquidGlass"), { 48, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20 } },
-    { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } }
+    { QStringLiteral("LiquidGlass"), { 48, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20, 100 } },
+    { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, 100 } },
+    { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, 100 } },
+    { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, 100 } },
+    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, 100 } },
+    { QStringLiteral("CyberpunkNeon"), { 50, 4, 0.90, 1.60, 1.10, QStringLiteral("#1a0f0014"), QStringLiteral("#8000f0ff"), true, 18, 12, 6, 35, 90 } },
+    { QStringLiteral("MaterialYou"), { 42, 2, 1.05, 1.25, 1.00, QStringLiteral("#1f6b5bb5"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, 95 } },
+    { QStringLiteral("DeepSpace"), { 55, 6, 0.60, 0.80, 1.20, QStringLiteral("#4d0b0f19"), QStringLiteral("#1a7da0ff"), true, 8, 16, 5, 10, 85 } },
+    { QStringLiteral("VibrantEmerald"), { 44, 4, 0.95, 1.45, 1.05, QStringLiteral("#1d0a2912"), QStringLiteral("#5039e080"), true, 12, 14, 5, 15, 92 } },
+    { QStringLiteral("VintageAmber"), { 40, 5, 1.00, 1.30, 1.05, QStringLiteral("#26301d06"), QStringLiteral("#40ffaa00"), true, 10, 15, 6, 20, 90 } }
 };
 
 BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
@@ -86,6 +92,7 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
 
     connectControl(ui.kcfg_BlurStrength, &QSlider::valueChanged);
     connectControl(ui.kcfg_NoiseStrength, &QSlider::valueChanged);
+    connectControl(ui.kcfg_WindowOpacity, &QSlider::valueChanged);
     connectControl(ui.kcfg_Brightness, &QDoubleSpinBox::valueChanged);
     connectControl(ui.kcfg_Saturation, &QDoubleSpinBox::valueChanged);
     connectControl(ui.kcfg_Contrast, &QDoubleSpinBox::valueChanged);
@@ -114,6 +121,11 @@ void BlurEffectConfig::populateProfiles()
     ui.ActiveProfile->addItem(i18n("macOS Dark"), QStringLiteral("MacosDark"));
     ui.ActiveProfile->addItem(i18n("Windows Acrylic"), QStringLiteral("WindowsAcrylic"));
     ui.ActiveProfile->addItem(i18n("Frosty Glass"), QStringLiteral("FrostyGlass"));
+    ui.ActiveProfile->addItem(i18n("Cyberpunk Neon"), QStringLiteral("CyberpunkNeon"));
+    ui.ActiveProfile->addItem(i18n("Material You"), QStringLiteral("MaterialYou"));
+    ui.ActiveProfile->addItem(i18n("Deep Space"), QStringLiteral("DeepSpace"));
+    ui.ActiveProfile->addItem(i18n("Vibrant Emerald"), QStringLiteral("VibrantEmerald"));
+    ui.ActiveProfile->addItem(i18n("Vintage Amber"), QStringLiteral("VintageAmber"));
     ui.ActiveProfile->addItem(i18n("Custom / Manual"), QStringLiteral("Custom"));
 }
 
@@ -138,6 +150,7 @@ void BlurEffectConfig::applyPreset(const QString &profileName)
 
     ui.kcfg_BlurStrength->setValue(preset.blurStrength);
     ui.kcfg_NoiseStrength->setValue(preset.noiseStrength);
+    ui.kcfg_WindowOpacity->setValue(preset.windowOpacity);
     ui.kcfg_Brightness->setValue(preset.brightness);
     ui.kcfg_Saturation->setValue(preset.saturation);
     ui.kcfg_Contrast->setValue(preset.contrast);

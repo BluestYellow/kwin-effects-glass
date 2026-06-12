@@ -20,7 +20,7 @@ float roundedRectangleDist(vec2 p, vec2 b, vec4 cornerRadius)
 
 vec4 roundedRectangle(vec2 fragCoord, vec3 color, vec4 cornerRadius)
 {
-    vec2 halfblurSize = blurSize * 0.5;
+    vec2 halfblurSize = box.zw;
     vec2 p = fragCoord - halfblurSize;
     float dist = roundedRectangleDist(p, halfblurSize, cornerRadius);
 
@@ -34,10 +34,11 @@ vec4 roundedRectangle(vec2 fragCoord, vec3 color, vec4 cornerRadius)
 
 vec4 glass(vec4 sum, vec4 cornerRadius)
 {
-    vec2 halfBlurSize = blurSize * 0.5;
+    vec2 halfBlurSize = box.zw;
+    vec2 blurSize = box.zw * 2.0;
     float minHalfSize = min(halfBlurSize.x, halfBlurSize.y);
 
-    vec2 position = uv * blurSize - halfBlurSize.xy;
+    vec2 position = vertex - box.xy;
     float dist = roundedRectangleDist(position, halfBlurSize, cornerRadius);
 
     if (dist >= 0.0) {
@@ -61,17 +62,17 @@ vec4 glass(vec4 sum, vec4 cornerRadius)
 
         float finalStrength = min(0.4 * concaveFactor * refractionStrength, 1.0);
 
-        vec2 refractOffsetG = -normal.xy * finalStrength;
-        vec2 refractOffsetR = -normal.xy * finalStrength;
-        vec2 refractOffsetB = -normal.xy * finalStrength;
+        vec2 refractOffsetG = -normal.xy * finalStrength * 2.0 * halfpixel;
+        vec2 refractOffsetR = -normal.xy * finalStrength * 2.0 * halfpixel;
+        vec2 refractOffsetB = -normal.xy * finalStrength * 2.0 * halfpixel;
 
         // Different refraction offsets for each color channel
         float fringingFactor = refractionRGBFringing * 0.3;
         if (fringingFactor > 0.0) {
             // Red bends most
-            refractOffsetR = -normal.xy * (finalStrength * (1.0 + fringingFactor));
+            refractOffsetR = -normal.xy * (finalStrength * (1.0 + fringingFactor)) * 2.0 * halfpixel;
             // Blue bends least
-            refractOffsetB = -normal.xy * (finalStrength * (1.0 - fringingFactor));
+            refractOffsetB = -normal.xy * (finalStrength * (1.0 - fringingFactor)) * 2.0 * halfpixel;
         }
 
         vec2 coordR = clamp(uv - refractOffsetR, 0.0, 1.0);
@@ -111,5 +112,5 @@ vec4 glass(vec4 sum, vec4 cornerRadius)
     }
 
     vec3 tinted = mix(sum.rgb, tintColor, clamp(tintStrength, 0.0, 1.0));
-    return roundedRectangle(uv * blurSize, tinted, cornerRadius);
+    return roundedRectangle(vertex - (box.xy - box.zw), tinted, cornerRadius);
 }

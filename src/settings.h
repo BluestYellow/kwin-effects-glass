@@ -72,6 +72,7 @@ struct RefractionSettings
     float refractionNormalPow;
     float refractionRGBFringing;
     float refractionOffsetStrength;
+    float refractionBevelIntensity;
     bool physicallyBased;
 };
 

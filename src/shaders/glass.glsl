@@ -9,6 +9,7 @@ uniform float refractionStrength;
 uniform float refractionNormalPow;
 uniform float refractionRGBFringing;
 uniform float refractionOffsetStrength;
+uniform float refractionBevelIntensity;
 uniform int physicallyBasedRefraction;
 
 float roundedRectangleDist(vec2 p, vec2 b, vec4 cornerRadius)
@@ -97,9 +98,9 @@ vec3 glassOutline(vec2 position, GlassFragment s)
         float edgeProfile = edgeMask - borderInner;
         float thicknessShadow = pow(edgeProfile, 0.9);
         float shadowMask = smoothstep(blurSize.y * 0.7, -blurSize.y * 0.7, position.y) *
-                           smoothstep(blurSize.x * 0.7, -blurSize.x * 0.7, -position.x);
+                           smoothstep(blurSize.x * 0.7, -blurSize.x * 0.7, position.x);
         float highlightMask = smoothstep(-blurSize.y * 0.7, blurSize.y * 0.7, position.y) *
-                              smoothstep(-blurSize.x * 0.7, blurSize.x * 0.7, -position.x);
+                              smoothstep(-blurSize.x * 0.7, blurSize.x * 0.7, position.x);
 
         glow = mix(glow, vec3(1.0), thicknessShadow * shadowMask);
         glow = mix(glow, vec3(1.0), thicknessShadow * highlightMask);

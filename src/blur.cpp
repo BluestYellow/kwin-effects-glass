@@ -31,6 +31,11 @@
 #include "wayland/surface.h"
 #include "window.h"
 
+#ifdef GLASS_KWIN_67
+#include "wayland/backgroundeffect_v1.h"
+#include "wayland_server.h"
+#endif
+
 #if PLASMA_VERSION >= 0x060404 && !defined(GLASS_X11)
 #include <scene/backgroundeffectitem.h>
 #endif
@@ -114,8 +119,8 @@ BlurEffect::BlurEffect()
     ensureResources();
 
     m_roundedOnscreenPass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
-                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded.vert"),
-                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded.frag"));
+                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded_core.vert"),
+                                                                                     QStringLiteral(":/effects/glass/generated/onscreen_rounded_core.frag"));
     if (!m_roundedOnscreenPass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load onscreen pass shader";
         return;
@@ -146,7 +151,7 @@ BlurEffect::BlurEffect()
 
     m_downsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
                                                                                 QStringLiteral(":/effects/glass/generated/vertex.vert"),
-                                                                                QStringLiteral(":/effects/glass/generated/downsample.frag"));
+                                                                                QStringLiteral(":/effects/glass/generated/downsample_core.frag"));
     if (!m_downsamplePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load downsampling pass shader";
         return;
@@ -158,7 +163,7 @@ BlurEffect::BlurEffect()
 
     m_upsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
                                                                               QStringLiteral(":/effects/glass/generated/vertex.vert"),
-                                                                              QStringLiteral(":/effects/glass/generated/upsample.frag"));
+                                                                              QStringLiteral(":/effects/glass/generated/upsample_core.frag"));
     if (!m_upsamplePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load upsampling pass shader";
         return;
@@ -170,8 +175,8 @@ BlurEffect::BlurEffect()
     }
 
     m_noisePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
-                                                                           QStringLiteral(":/effects/glass/generated/vertex.vert"),
-                                                                           QStringLiteral(":/effects/glass/generated/noise.frag"));
+                                                                           QStringLiteral(":/effects/glass/generated/vertex_core.vert"),
+                                                                           QStringLiteral(":/effects/glass/generated/noise_core.frag"));
     if (!m_noisePass.shader) {
         qCWarning(KWIN_BLUR) << "Failed to load noise pass shader";
         return;
@@ -187,6 +192,10 @@ BlurEffect::BlurEffect()
     if (effects->xcbConnection()) {
         net_wm_blur_region = effects->announceSupportProperty(s_blurAtomName, this);
     }
+#endif
+
+#ifdef GLASS_KWIN_67
+    waylandServer()->backgroundEffectManager()->addBlurCapability();
 #endif
 
     connect(effects, &EffectsHandler::windowAdded, this, &BlurEffect::slotWindowAdded);
@@ -253,6 +262,10 @@ BlurEffect::~BlurEffect()
     if (s_contrastManager) {
         s_contrastManagerRemoveTimer->start(1000);
     }
+#endif
+
+#ifdef GLASS_WIN_67
+    waylandServer()->backgroundEffectManager()->removeBlurCapability();
 #endif
 }
 
@@ -423,17 +436,6 @@ void BlurEffect::updateBlurRegion(EffectWindow *w)
                 region += rect.toAlignedRect();
             }
             content = region;
-        } else if (w->isDock() || w->isMenu() || w->isDropdownMenu() || w->isPopupMenu() || w->isPopupWindow()) {
-            const RegionF surfaceFallbackRegion = surface->opaque().isEmpty() ? surface->input() : surface->opaque();
-            if (!surfaceFallbackRegion.isEmpty()) {
-                Region region;
-                for (const RectF &rect : surfaceFallbackRegion.rects()) {
-                    region += rect.toAlignedRect();
-                }
-                content = region;
-            } else {
-                content = Region();
-            }
         }
 #else
         if (surface->blur()) {
@@ -807,11 +809,17 @@ BlurRegion BlurEffect::contentRegion(EffectWindow *w, const BorderRadius *fallba
 
     if (auto it = m_windows.find(w); it != m_windows.end()) {
         const std::optional<BlurRegion> &content = it->second.content;
-        if (!m_settings.roundedCorners.ignoreContentBlurRegion && content.has_value() && !content->isEmpty()) {
-            region = content->translated(w->contentsRect().topLeft().toPoint()) & w->contentsRect().toRect();
+        if (!m_settings.roundedCorners.ignoreContentBlurRegion || w->isDock()) {
+            if (content.has_value()) {
+                if (content->isEmpty()) {
+                    region = w->contentsRect().toAlignedRect();
+                } else {
+                    region = content->translated(
+                            w->contentsRect().x(),
+                            w->contentsRect().y()) & w->contentsRect().toAlignedRect();
+                }
+            }
         } else {
-            // An empty region means that the blur effect should be enabled
-            // for the whole window.
             const BorderRadius declaredCornerRadius = it->second.originalCornerRadius.value_or(w->window()->borderRadius());
             const BorderRadius cornerRadius = fallbackCornerRadius
                 ? *fallbackCornerRadius
@@ -828,6 +836,7 @@ BlurRegion BlurEffect::contentRegion(EffectWindow *w, const BorderRadius *fallba
                                           topHeight,
                                           bottomHeight);
         }
+
     }
 
     return region;

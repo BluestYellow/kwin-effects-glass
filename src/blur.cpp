@@ -264,7 +264,7 @@ BlurEffect::~BlurEffect()
     }
 #endif
 
-#ifdef GLASS_WIN_67
+#ifdef GLASS_KWIN_67
     waylandServer()->backgroundEffectManager()->removeBlurCapability();
 #endif
 }

@@ -37,14 +37,16 @@ struct GlassPreset {
     int refractionEdgeSize;
     int refractionNormalPow;
     int refractionRGBFringing;
+    bool oklabSaturation;
+    bool physicallyBasedRefraction;
 };
 
 static const QMap<QString, GlassPreset> s_presets = {
-    { QStringLiteral("LiquidGlass"), { 48, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20 } },
-    { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } },
-    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0 } }
+    { QStringLiteral("LiquidGlass"), { 48, 3, 1.05, 1.15, 1.00, QStringLiteral("#0dffffff"), QStringLiteral("#40ffffff"), true, 14, 15, 7, 20, true, true } },
+    { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
+    { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
+    { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
+    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } }
 };
 
 BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
@@ -120,6 +122,8 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
     connectControl(ui.kcfg_BlurMatching, &QRadioButton::toggled);
     connectControl(ui.kcfg_BlurNonMatching, &QRadioButton::toggled);
     connectControl(ui.kcfg_BlurAllExceptDocksMenus, &QRadioButton::toggled);
+    connectControl(ui.kcfg_OklabSaturation, &QCheckBox::toggled);
+    connectControl(ui.kcfg_PhysicallyBasedRefraction, &QCheckBox::toggled);
 
     setupContextualHelp();
 }
@@ -169,6 +173,8 @@ void BlurEffectConfig::applyPreset(const QString &profileName)
     ui.kcfg_RefractionEdgeSize->setValue(preset.refractionEdgeSize);
     ui.kcfg_RefractionNormalPow->setValue(preset.refractionNormalPow);
     ui.kcfg_RefractionRGBFringing->setValue(preset.refractionRGBFringing);
+    ui.kcfg_OklabSaturation->setChecked(preset.oklabSaturation);
+    ui.kcfg_PhysicallyBasedRefraction->setChecked(preset.physicallyBasedRefraction);
 
     m_updatingFromPreset = false;
 }

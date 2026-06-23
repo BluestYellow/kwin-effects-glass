@@ -28,11 +28,39 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
+# Synchronize with upstream repository
+sync_upstream() {
+    log_info "Checking for upstream repository updates..."
+
+    # Check if 'upstream' remote exists
+    if ! git remote | grep -q '^upstream$'; then
+        log_info "Upstream remote not found. Skipping synchronization."
+        return 0
+    fi
+
+    log_info "Fetching updates from upstream..."
+    if ! git fetch upstream; then
+        log_warning "Failed to fetch from upstream. Continuing with local version."
+        return 0
+    fi
+
+    log_info "Merging updates from upstream/main..."
+    if ! git merge upstream/main; then
+        log_error "Merge conflict detected. Please resolve conflicts manually and run the script again."
+        exit 1
+    fi
+
+    log_success "Successfully synchronized with upstream."
+}
+
 # Ensure script is run from the directory containing it
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}"
 
 log_info "Starting kwin-effects-glass installation/update script..."
+
+# Synchronize with upstream if available
+sync_upstream
 
 # 1. Check for required build tools (cmake, make)
 log_info "Checking for required build tools..."

@@ -65,6 +65,8 @@ void BlurSettings::read()
     general.activeProfile = BlurConfig::activeProfile();
     general.excludeDecorations = BlurConfig::excludeDecorations();
     general.excludeTooltips = BlurConfig::excludeTooltips();
+    general.excludeMenus = BlurConfig::excludeMenus();
+    general.excludeOSD = BlurConfig::excludeOSD();
 
     forceBlur.windowClasses = parseWindowClasses(BlurConfig::windowClasses());
     if (BlurConfig::blurMatching()) {
@@ -86,6 +88,7 @@ void BlurSettings::read()
     roundedCorners.ignoreContentBlurRegion = BlurConfig::ignoreContentBlurRegion();
     roundedCorners.roundMaximized = BlurConfig::roundCornersOfMaximizedWindows();
     roundedCorners.dynamicCorners = BlurConfig::dynamicCorners();
+    roundedCorners.dynamicCornersExcludeWindows = BlurConfig::dynamicCornersExcludeWindows();
     roundedCorners.dynamicCornersExcludeDocks = BlurConfig::dynamicCornersExcludeDocks();
     roundedCorners.dynamicCornersExcludeTooltips = BlurConfig::dynamicCornersExcludeTooltips();
     roundedCorners.dynamicCornersExcludeMenus = BlurConfig::dynamicCornersExcludeMenus();

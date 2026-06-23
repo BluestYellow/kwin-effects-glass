@@ -38,6 +38,8 @@ struct GeneralSettings
     QString activeProfile;
     bool excludeDecorations;
     bool excludeTooltips;
+    bool excludeMenus;
+    bool excludeOSD;
 };
 
 struct ForceBlurSettings
@@ -59,6 +61,7 @@ struct RoundedCornersSettings
     bool ignoreContentBlurRegion;
     bool roundMaximized;
     bool dynamicCorners;
+    bool dynamicCornersExcludeWindows;
     bool dynamicCornersExcludeDocks;
     bool dynamicCornersExcludeTooltips;
     bool dynamicCornersExcludeMenus;

@@ -811,7 +811,11 @@ BlurRegion BlurEffect::contentRegion(EffectWindow *w, const BorderRadius *fallba
         if (!m_settings.roundedCorners.ignoreContentBlurRegion || w->isDock()) {
             if (content.has_value()) {
                 if (content->isEmpty()) {
+#ifdef GLASS_X11
                     region = w->contentsRect().toAlignedRect();
+#else
+                    region = Rect(w->contentsRect().toAlignedRect());
+#endif
                 } else {
                     region = content->translated(
                             w->contentsRect().x(),
@@ -1135,7 +1139,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
                                              backgroundRect.width() * viewport.scale(),
                                              backgroundRect.height() * viewport.scale());
     const QRect scaledBackgroundRect = snapToPixelGrid(scaledLogicalBackgroundRect);
-    const QRect deviceBackgroundRect = viewport.mapToDeviceCoordinatesAligned(Rect(backgroundRect));
+    const QRect deviceBackgroundRect = viewport.mapToDeviceCoordinates(Rect(backgroundRect)).rounded();
 #endif
     const auto opacity = data.opacity();
 
@@ -1469,6 +1473,14 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         if (w->isTooltip() && m_settings.general.excludeTooltips) {
             return 0.0f;
         }
+        if ((w->isNotification() || w->isOnScreenDisplay()) && m_settings.general.excludeOSD) {
+            return 0.0f;
+        }
+        if (m_settings.general.excludeMenus && !w->isTooltip() &&
+                (w->isMenu() || w->isDropdownMenu() || w->isPopupMenu() || w->isPopupWindow())
+           ) {
+            return 0.0f;
+        }
         if (decorationRegion && m_settings.general.excludeDecorations) {
             return 0.0f;
         }
@@ -1573,17 +1585,24 @@ bool BlurEffect::blocksDirectScanout() const
 bool BlurEffect::shouldFlattenCorner(KWin::EffectWindow *w, Qt::Corner corner) const {
     if (!w || !m_settings.roundedCorners.dynamicCorners) {
         return false;
-    }
-    if (m_settings.roundedCorners.dynamicCornersExcludeDocks && w->isDock()) {
+    } else if (m_settings.roundedCorners.dynamicCornersExcludeDocks && w->isDock()) {
         return false;
-    }
-    if (m_settings.roundedCorners.dynamicCornersExcludeTooltips && w->isTooltip()) {
+    } else if (m_settings.roundedCorners.dynamicCornersExcludeTooltips && w->isTooltip()) {
         return false;
-    }
-    if (
+    } else if (
         m_settings.roundedCorners.dynamicCornersExcludeMenus &&
         !w->isTooltip() &&
         (w->isMenu() || w->isDropdownMenu() || w->isPopupMenu() || w->isPopupWindow())
+    ) {
+        return false;
+    } else if (
+        m_settings.roundedCorners.dynamicCornersExcludeWindows &&
+        !w->isTooltip() &&
+        !w->isMenu() &&
+        !w->isDropdownMenu() &&
+        !w->isPopupMenu() &&
+        !w->isPopupWindow() &&
+        !w->isDock()
     ) {
         return false;
     }
@@ -1603,6 +1622,18 @@ bool BlurEffect::shouldFlattenCorner(KWin::EffectWindow *w, Qt::Corner corner) c
         case Qt::BottomLeftCorner:  cornerPos = rect.bottomLeft(); break;
         case Qt::BottomRightCorner: cornerPos = rect.bottomRight(); break;
     }
+
+    const QRectF screenRect = effects->clientArea(KWin::FullScreenArea, w);
+
+    bool touchesDesktopLeft   = isLeft   && std::abs(cornerPos.x() - screenRect.left())   < margin;
+    bool touchesDesktopRight  = isRight  && std::abs(cornerPos.x() - screenRect.right())  < margin;
+    bool touchesDesktopTop    = isTop    && std::abs(cornerPos.y() - screenRect.top())    < margin;
+    bool touchesDesktopBottom = isBottom && std::abs(cornerPos.y() - (screenRect.y() + screenRect.height())) < margin;
+
+    if (touchesDesktopLeft ||
+        touchesDesktopRight ||
+        touchesDesktopTop ||
+        touchesDesktopBottom) return true;
 
     for (auto it = m_windows.begin(); it != m_windows.end(); ++it) {
         KWin::EffectWindow *other = it->first;

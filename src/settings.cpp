@@ -53,9 +53,7 @@ void BlurSettings::read()
     general.contrast = BlurConfig::contrast();
     general.oklabSaturation = BlurConfig::oklabSaturation();
 
-    const float finetune = 0.5f + std::clamp(BlurConfig::blurFinetune(), 0, 10) * 0.13f;
-    general.blurRadius = finetune;
-    general.upsampleOffset = finetune;
+    general.blurFinetune = 0.5f + std::clamp(BlurConfig::blurFinetune(), 0, 10) * 0.13f;
     general.saturationCompensation = BlurConfig::blurSaturationCompensation();
 
     general.tintColor = BlurConfig::tintColor();

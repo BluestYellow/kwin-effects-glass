@@ -34,6 +34,8 @@
         </entry>
         <entry name="BlurStrength" type="Int">
             <default>48</default>
+            <min>1</min>
+            <max>60</max>
         </entry>
         <entry name="BlurFinetune" type="Int">
             <default>3</default>
@@ -46,12 +48,16 @@
         </entry>
         <entry name="DecorationBlurStrength" type="Int">
             <default>15</default>
+            <min>1</min>
+            <max>15</max>
         </entry>
         <entry name="DecorationNoiseStrength" type="Int">
             <default>5</default>
         </entry>
         <entry name="DockBlurStrength" type="Int">
             <default>15</default>
+            <min>1</min>
+            <max>15</max>
         </entry>
         <entry name="DockNoiseStrength" type="Int">
             <default>5</default>

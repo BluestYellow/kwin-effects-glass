@@ -46,7 +46,11 @@ static const QMap<QString, GlassPreset> s_presets = {
     { QStringLiteral("MacosLight"), { 32, 2, 1.15, 1.40, 1.00, QStringLiteral("#1cffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
     { QStringLiteral("MacosDark"), { 36, 2, 0.75, 1.50, 1.10, QStringLiteral("#331c1c1c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
     { QStringLiteral("WindowsAcrylic"), { 60, 12, 0.90, 1.20, 1.00, QStringLiteral("#2d0c0c0c"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
-    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } }
+    { QStringLiteral("FrostyGlass"), { 40, 5, 1.00, 1.00, 1.00, QStringLiteral("#4dffffff"), QStringLiteral("#00000000"), false, 0, 10, 4, 0, false, false } },
+    { QStringLiteral("AeroGlass"), { 44, 4, 1.10, 1.20, 1.00, QStringLiteral("#26aaccff"), QStringLiteral("#3066aaff"), true, 6, 12, 5, 8, true, true } },
+    { QStringLiteral("SmokedGlass"), { 50, 6, 0.70, 1.10, 1.15, QStringLiteral("#80101010"), QStringLiteral("#00000000"), false, 4, 12, 5, 5, true, false } },
+    { QStringLiteral("CrystalClear"), { 28, 1, 1.05, 1.10, 1.05, QStringLiteral("#0affffff"), QStringLiteral("#26ffffff"), true, 18, 18, 8, 28, true, true } },
+    { QStringLiteral("NeonGlow"), { 46, 4, 1.00, 1.45, 1.05, QStringLiteral("#1a00ffd5"), QStringLiteral("#5900ffd5"), true, 12, 14, 7, 22, true, true } }
 };
 
 BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
@@ -114,6 +118,7 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
     connectControl(ui.kcfg_Saturation, &QDoubleSpinBox::valueChanged);
     connectControl(ui.kcfg_Contrast, &QDoubleSpinBox::valueChanged);
     connectControl(ui.kcfg_TintColor, &QLineEdit::textChanged);
+    connectControl(ui.kcfg_AutoTintAlpha, &QCheckBox::toggled);
     connectControl(ui.kcfg_GlowColor, &QLineEdit::textChanged);
     connectControl(ui.kcfg_EdgeLighting, &QCheckBox::toggled);
     connectControl(ui.kcfg_RefractionStrength, &QSlider::valueChanged);
@@ -140,6 +145,10 @@ void BlurEffectConfig::populateProfiles()
     ui.ActiveProfile->addItem(i18n("macOS Dark"), QStringLiteral("MacosDark"));
     ui.ActiveProfile->addItem(i18n("Windows Acrylic"), QStringLiteral("WindowsAcrylic"));
     ui.ActiveProfile->addItem(i18n("Frosty Glass"), QStringLiteral("FrostyGlass"));
+    ui.ActiveProfile->addItem(i18n("Aero Glass"), QStringLiteral("AeroGlass"));
+    ui.ActiveProfile->addItem(i18n("Smoked Glass"), QStringLiteral("SmokedGlass"));
+    ui.ActiveProfile->addItem(i18n("Crystal Clear"), QStringLiteral("CrystalClear"));
+    ui.ActiveProfile->addItem(i18n("Neon Glow"), QStringLiteral("NeonGlow"));
     ui.ActiveProfile->addItem(i18n("Custom / Manual"), QStringLiteral("Custom"));
 }
 

@@ -38,19 +38,34 @@ sync_upstream() {
         return 0
     fi
 
+    # Never touch a dirty working tree; building the local version is fine.
+    if ! git diff-index --quiet HEAD --; then
+        log_warning "Uncommitted local changes detected. Skipping upstream merge; building the local version."
+        return 0
+    fi
+
     log_info "Fetching updates from upstream..."
     if ! git fetch upstream; then
         log_warning "Failed to fetch from upstream. Continuing with local version."
         return 0
     fi
 
-    log_info "Merging updates from upstream/main..."
-    if ! git merge upstream/main; then
-        log_error "Merge conflict detected. Please resolve conflicts manually and run the script again."
-        exit 1
+    # Already contains upstream/main? Nothing to merge.
+    if git merge-base --is-ancestor upstream/main HEAD; then
+        log_info "Already up to date with upstream/main."
+        return 0
     fi
 
-    log_success "Successfully synchronized with upstream."
+    log_info "Merging updates from upstream/main..."
+    if git merge --no-edit upstream/main; then
+        log_success "Successfully synchronized with upstream."
+    else
+        # This fork intentionally diverges from upstream, so conflicts are
+        # expected. Abort cleanly and build the local version instead of
+        # leaving the tree half-merged.
+        log_warning "Upstream changes conflict with the local fork. Aborting merge; building the local version."
+        git merge --abort || true
+    fi
 }
 
 # Ensure script is run from the directory containing it

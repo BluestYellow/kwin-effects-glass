@@ -1,5 +1,6 @@
 uniform vec3 tintColor;
 uniform float tintStrength;
+uniform int autoTintAlpha;
 uniform vec3 glowColor;
 uniform float glowStrength;
 uniform int edgeLighting;
@@ -89,7 +90,23 @@ vec3 glassOutline(vec2 position, GlassFragment s)
     float rimMask = clamp(0.25 * s.concaveFactor, 0.0, glowStrength);
     vec3 glow = mix(s.color.rgb, glowColor, rimMask);
     if (edgeLighting == 1) {
-        glow += (s.color.rgb * s.concaveFactor);
+        if (physicallyBasedRefraction == 1) {
+            // Reuse the bevel normal produced by snell's refraction (otherwise
+            // discarded) to light the rim like real glass: a Fresnel-weighted
+            // specular streak, brightest where the bevel faces a fixed
+            // top-left light, fading to nothing across the flat interior.
+            vec3 lightDir = normalize(vec3(-0.55, -0.55, 0.63));
+            vec3 viewDir = vec3(0.0, 0.0, 1.0);
+            vec3 halfVec = normalize(lightDir + viewDir);
+            float spec = pow(max(dot(s.normal, halfVec), 0.0), 32.0);
+            float fresnel = pow(1.0 - clamp(dot(s.normal, viewDir), 0.0, 1.0), 4.0);
+            float rim = s.concaveFactor;
+            glow += s.color.rgb * rim;
+            glow += vec3(spec * rim);
+            glow = mix(glow, vec3(1.0), clamp(fresnel * rim, 0.0, 1.0) * 0.6);
+        } else {
+            glow += (s.color.rgb * s.concaveFactor);
+        }
     }
 
     if (glowStrength > 0.0) {
@@ -98,15 +115,43 @@ vec3 glassOutline(vec2 position, GlassFragment s)
         float edgeProfile = edgeMask - borderInner;
         float thicknessShadow = pow(edgeProfile, 0.9);
         float shadowMask = smoothstep(blurSize.y * 0.7, -blurSize.y * 0.7, position.y) *
-                           smoothstep(blurSize.x * 0.7, -blurSize.x * 0.7, -position.x);
+                           smoothstep(blurSize.x * 0.7, -blurSize.x * 0.7, position.x);
         float highlightMask = smoothstep(-blurSize.y * 0.7, blurSize.y * 0.7, position.y) *
-                              smoothstep(-blurSize.x * 0.7, blurSize.x * 0.7, -position.x);
+                              smoothstep(-blurSize.x * 0.7, blurSize.x * 0.7, position.x);
 
         glow = mix(glow, vec3(1.0), thicknessShadow * shadowMask);
         glow = mix(glow, vec3(1.0), thicknessShadow * highlightMask);
     }
 
     return glow;
+}
+
+vec3 averageBackgroundColor()
+{
+    vec3 sum = vec3(0.0);
+    const int sampleCount = 3;
+
+    for (int y = 0; y < sampleCount; ++y) {
+        for (int x = 0; x < sampleCount; ++x) {
+            vec2 coord = (vec2(float(x), float(y)) + vec2(0.5)) / float(sampleCount);
+            sum += TEXTURE(autoTintTexUnit, coord).rgb;
+        }
+    }
+
+    return sum / float(sampleCount * sampleCount);
+}
+
+float adjustedTintStrength(float baseTintStrength)
+{
+    float strength = clamp(baseTintStrength, 0.0, 1.0);
+    if (autoTintAlpha == 0 || strength <= 0.0) {
+        return strength;
+    }
+
+    const vec3 grayscaleWeights = vec3(0.299, 0.587, 0.114);
+    float backgroundGray = dot(averageBackgroundColor(), grayscaleWeights);
+    float tintGray = dot(tintColor, grayscaleWeights);
+    return strength * clamp(abs(backgroundGray - tintGray), 0.0, 1.0);
 }
 
 vec4 glass(vec4 sum, vec4 cornerRadius)
@@ -136,6 +181,6 @@ vec4 glass(vec4 sum, vec4 cornerRadius)
     }
 
     vec3 rgb = s.concaveFactor < 1.0 ? glassOutline(position, s) : s.color.rgb;
-    vec3 tinted = mix(rgb, tintColor, clamp(tintStrength, 0.0, 1.0));
+    vec3 tinted = mix(rgb, tintColor, adjustedTintStrength(tintStrength));
     return roundedRectangle(uv * blurSize, tinted, cornerRadius);
 }

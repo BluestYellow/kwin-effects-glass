@@ -635,6 +635,16 @@
              <item>
               <layout class="QVBoxLayout" name="tintExclusionsLayout">
                <item>
+                <widget class="QCheckBox" name="kcfg_AutoTintAlpha">
+                 <property name="text">
+                  <string>Automatically adjust tint strength</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>Scales tint strength by comparing the average background color with the text color.</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QCheckBox" name="kcfg_ExcludeDocks">
                  <property name="text">
                   <string>Don't apply tint to docks</string>

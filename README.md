@@ -32,7 +32,7 @@ Glass is a fork of the Plasma 6 blur effect with additional features and bug fix
 - Rounded corners with anti-aliasing
 - Adjust blur brightness, contrast and saturation
 - Tint, glow, and edge lighting (brighter edges)
-- Snells refractoin (by [@PKMNPlatin](github.com/PKMNPlatin/kwin-effects-snell-glass)
+- Snell's refraction (by [@PKMNPlatin](https://github.com/PKMNPlatin/kwin-effects-snell-glass))
   
 ### Support for previous Plasma releases
 Currently supported versions: **6.7** and **6.6**

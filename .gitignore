@@ -3,3 +3,13 @@ result*
 cmake-build-debug
 build
 src/generated
+
+# Local agent and generated project-intelligence state.
+.agent/
+.agents/
+.antigravitycli/
+.claude/
+.codex/
+.gemini/
+.serena/
+graphify-out/

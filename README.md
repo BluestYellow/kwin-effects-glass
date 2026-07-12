@@ -43,6 +43,13 @@ big thanks to [@dnmodder](https://github.com/dnmodder) for providing the patch f
 - The last version to support plasma 6.5.x (and X11) is 0ae94cf5e709a894a9f1f54544cb17deb7f77d58
 
 # Installation
+
+## Restoring the project after reinstalling Linux
+
+The complete CachyOS/Arch workstation recovery procedure is documented in
+[`docs/workstation-recovery.md`](docs/workstation-recovery.md). A new operator or
+LLM should follow that document before building, installing, or changing the
+effect.
 > [!IMPORTANT]
 > If the effect stops working after a system upgrade, you will need to rebuild it or reinstall the package.
 
